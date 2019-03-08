@@ -2,10 +2,16 @@
     <div>
         <v-card>
             <v-container fluid grid-list-md>
-                    <h1>{{ asistencia.firstname }} {{ asistencia.lastname }}</h1>
+                <h1>{{ asistencia.firstname }} {{ asistencia.lastname }}</h1>
 
-                    <asistencia-form :asistencia="asistencia" ></asistencia-form>
-                    <asistencia-table :asistencias="asistencias"></asistencia-table>
+                <asistencia-form
+                        :asistencia="asistencia"
+                        @store="save" />
+
+                <asistencia-table
+                        :headers="headers"
+                        :asistencias="asistencias" />
+
             </v-container>
         </v-card>
     </div>
@@ -24,21 +30,12 @@
             AsistenciaTable
         },
         data: () => ({
-            valid: false,
             asistencia: {
-                firstname: '',
+                name: '',
                 lastname: '',
                 email: '',
             },
             asistencias: [],
-            nameRules: [
-                v => !!v || 'Name is required',
-                v => v.length <= 10 || 'Name must be less than 10 characters'
-            ],
-            emailRules: [
-                v => !!v || 'E-mail is required',
-                v => /.+@.+/.test(v) || 'E-mail must be valid'
-            ],
             headers: [
                 {
                     text: 'Id',
@@ -52,15 +49,18 @@
         },
         methods: {
             show() {
+                let vm = this
+                console.log(db.collection('asistencia').get());
                 db.collection('asistencia').get().then((querySnapshot) => {
                     let asistenciaArray = []
                     querySnapshot.forEach((doc) => {
                         let asist = doc.data()
                         asist.id = doc.id
-                        asistenciaArray.push(asist)
+                        vm.asistencias.push(asist)
+                        //asistenciaArray.push(asist)
                         console.log(doc.id, ' => ', doc.data())
                     })
-                    this.asistencias = asistenciaArray
+                    //this.asistencias = asistenciaArray
                 })
 
             },
@@ -74,6 +74,8 @@
                     lastname: vm.asistencia.lastname,
                     email: vm.asistencia.email,
                 });
+                //this.push(this.asistencia)
+                this.show()
                 this.reset()
             },
             edit() {
