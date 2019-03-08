@@ -1,62 +1,28 @@
 <template>
     <div>
-        <span>{{ asistencia.firstname }} {{ asistencia.lastname }}</span>
-        <v-form v-model="valid">
-            <v-container>
-                <v-layout>
-                    <v-flex xs12 md4>
-                        <v-text-field
-                                v-model="asistencia.firstname"
-                                :rules="nameRules"
-                                :counter="10"
-                                label="First name"
-                                required></v-text-field>
-                    </v-flex>
+        <v-card>
+            <v-container fluid grid-list-md>
+                    <h1>{{ asistencia.firstname }} {{ asistencia.lastname }}</h1>
 
-                    <v-flex xs12 md4>
-                        <v-text-field
-                                v-model="asistencia.lastname"
-                                :rules="nameRules"
-                                :counter="10"
-                                label="Last name"
-                                required></v-text-field>
-                    </v-flex>
-
-                    <v-flex xs12 md4>
-                        <v-text-field
-                                @keyup.enter="presionarEnter"
-                                v-model="asistencia.email"
-                                :rules="emailRules"
-                                label="E-mail"
-                                required
-                        ></v-text-field>
-                    </v-flex>
-                </v-layout>
+                    <asistencia-form :asistencia="asistencia" ></asistencia-form>
+                    <asistencia-table :asistencias="asistencias"></asistencia-table>
             </v-container>
-
-            <v-btn @click.prevent="save" color="success">Guardar</v-btn>
-        </v-form>
-
-        <!--<table class="table">
-            <tr><td>nombre</td></tr>
-            <tr v-for="asis in asistencias">
-                <td>{{ asis.name }}</td>
-            </tr>
-        </table>-->
-        <!--<v-data-table :headers="headers" :items="asistencias" class="elevation-1">
-            <template v-slot:items="props">
-                <td>{{ props.item.name }}</td>
-            </template>
-        </v-data-table>-->
-
-        <pre>{{ $data.asistencia }}</pre>
+        </v-card>
     </div>
 </template>
 
 <script>
+
     import {db} from './../firebase'
+    import AsistenciaForm from './../components/AsistenciaForm'
+    import AsistenciaTable from './../components/AsistenciaTable'
+
     export default {
         name: "asistencia",
+        components:{
+            AsistenciaForm,
+            AsistenciaTable
+        },
         data: () => ({
             valid: false,
             asistencia: {
@@ -75,7 +41,9 @@
             ],
             headers: [
                 {
-                    text: 'Nombres'
+                    text: 'Id',
+                    text: 'Nombres',
+                    text: 'Opción'
                 },
             ]
         }),
@@ -84,20 +52,35 @@
         },
         methods: {
             show() {
-                this.asistencias = db.collection('asistencia').get();
-                console.log(db.collection('asistencia').get());
+                db.collection('asistencia').get().then((querySnapshot) => {
+                    let asistenciaArray = []
+                    querySnapshot.forEach((doc) => {
+                        let asist = doc.data()
+                        asist.id = doc.id
+                        asistenciaArray.push(asist)
+                        console.log(doc.id, ' => ', doc.data())
+                    })
+                    this.asistencias = asistenciaArray
+                })
+
             },
             presionarEnter(){
                 alert('presiono enter');
             },
             save(){
-                alert(this.asistencia.firstname)
-                alert(this.asistencia.lastname)
                 let vm = this;
                 db.collection('asistencia').add({
-                    name: vm.asistencia.firstname,
+                    firstname: vm.asistencia.firstname,
+                    lastname: vm.asistencia.lastname,
+                    email: vm.asistencia.email,
                 });
                 this.reset()
+            },
+            edit() {
+
+            },
+            destroy(){
+
             },
             reset(){
                 this.asistencia.firstname=''
