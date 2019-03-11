@@ -29,7 +29,9 @@
                 ></v-text-field>
             </v-flex>
         </v-layout>
+
         <v-btn @click.prevent="saveChildren" color="success">Guardar</v-btn>
+
     </v-form>
 </template>
 
@@ -53,7 +55,7 @@
         }),
         methods:{
             saveChildren(){
-                this.$emit('store', /*this.datosParaEnviar*/)
+                this.$emit('storeUpdate', /*this.datosParaEnviar*/)
             }
         }
     }

@@ -6,7 +6,7 @@
 
                 <asistencia-form
                         :asistencia="asistencia"
-                        @store="save" />
+                        @storeUpdate="save" />
 
                 <asistencia-table
                         :headers="headers"
@@ -38,9 +38,9 @@
             asistencias: [],
             headers: [
                 {
-                    text: 'Id',
-                    text: 'Nombres',
-                    text: 'Opción'
+                    id: 'Id',
+                    name: 'Nombres',
+                    option: 'Opción'
                 },
             ]
         }),

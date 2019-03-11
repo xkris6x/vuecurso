@@ -19,7 +19,10 @@
             <tr v-for="asistencia in asistencias">
                 <td>{{ asistencia.id }}</td>
                 <td>{{ asistencia.firstname }}</td>
-                <td><a href="#" @click.prevent="openEdit(asistencia)" >edit</a></td>
+                <td>
+                    <a href="#" @click.prevent="openEdit(asistencia)" >edit</a>
+                    <a href="#" @click.prevent="destroy(asistencia.id)" >edit</a>
+                </td>
             </tr>
         </table>
 
@@ -34,24 +37,14 @@
                     Privacy Policy
                 </v-card-title>
 
-                <v-card-text>
+                <v-card-text >
                     <asistencia-form
                             :asistencia="editAsistencia"
-                            @store="update"/>
+                            @storeUpdate="update"/>
                 </v-card-text>
 
                 <v-divider></v-divider>
 
-                <v-card-actions>
-                    <v-spacer></v-spacer>
-                    <v-btn
-                            color="primary"
-                            flat
-                            @click="dialog = false"
-                    >
-                        I accept
-                    </v-btn>
-                </v-card-actions>
             </v-card>
         </v-dialog>
 
@@ -59,7 +52,7 @@
 </template>
 
 <script>
-
+    import {db} from './../firebase'
     import AsistenciaForm from './../components/AsistenciaForm'
 
     export default {
@@ -87,7 +80,20 @@
                 this.editAsistencia = asistencia
             },
             update(){
+                let vm = this
+                db.collection("asistencia").doc(this.editAsistencia.id).set({
+                    'first_name': vm.editAsistencia.name,
+                    'last_name': vm.editAsistencia.lastname,
+                    'email': vm.editAsistencia.email
+                });
                 alert(this.editAsistencia.name);
+            },
+            destroy(id){
+                db.collection("asistencia").doc(id).delete()
+            },
+            reset(){
+                this.editAsistencia={}
+                this.dialog = false
             }
         }
     }
