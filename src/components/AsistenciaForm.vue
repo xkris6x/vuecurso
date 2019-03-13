@@ -1,16 +1,16 @@
 <template>
     <v-form v-model="valid">
         <v-layout>
-            <v-flex xs12 md4>
+            <v-flex xs12 md3>
                 <v-text-field
-                        v-model="asistencia.name"
+                        v-model="asistencia.firstname"
                         :rules="nameRules"
                         :counter="10"
                         label="First name"
                         required></v-text-field>
             </v-flex>
 
-            <v-flex xs12 md4>
+            <v-flex xs12 md3>
                 <v-text-field
                         v-model="asistencia.lastname"
                         :rules="nameRules"
@@ -19,7 +19,7 @@
                         required></v-text-field>
             </v-flex>
 
-            <v-flex xs12 md4>
+            <v-flex xs12 md3>
                 <v-text-field
                         @keyup.enter="presionarEnter"
                         v-model="asistencia.email"
@@ -28,6 +28,14 @@
                         required
                 ></v-text-field>
             </v-flex>
+
+            <v-flex xs12 md3>
+                <v-text-field
+                        v-model="asistencia.precio"
+                        required
+                ></v-text-field>
+            </v-flex>
+
         </v-layout>
 
         <v-btn @click.prevent="saveChildren" color="success">Guardar</v-btn>

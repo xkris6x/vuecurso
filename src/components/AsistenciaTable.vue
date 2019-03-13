@@ -1,28 +1,31 @@
 <template>
     <div>
-        <!--<v-data-table :headers="headers" :items="asistencias" class="elevation-1">
-            <template v-slot:items="props">
-                <td>{{ props.item.id }}</td>
-                <td>{{ props.item.name }}</td>
-                <td>
-                    <a href="#">Edit</a>
-                </td>
-            </template>
-        </v-data-table>-->
+        <input type="text" >
 
-        <table width="100%">
+        <v-text-field
+                v-model="search"
+        ></v-text-field>
+
+        <table border="1" width="100%">
             <tr>
-                <td>id</td>
                 <td>nombre</td>
+                <td>Email</td>
+                <td>Precio</td>
                 <td>opciones</td>
             </tr>
-            <tr v-for="asistencia in asistencias">
-                <td>{{ asistencia.id }}</td>
-                <td>{{ asistencia.firstname }}</td>
+            <tr v-for="asistencia in filterAsistencias">
+                <td>{{ asistencia.firstname }} {{ asistencia.lastname }}</td>
+                <td>{{ asistencia.email }}</td>
+                <td>{{ asistencia.precio }}</td>
                 <td>
-                    <a href="#" @click.prevent="openEdit(asistencia)" >edit</a>
-                    <a href="#" @click.prevent="destroy(asistencia.id)" >edit</a>
+                    <a href="#" @click.prevent="openEdit(asistencia)" >Edit </a>
+                    <a href="#" @click.prevent="destroy(asistencia)" >Eliminar </a>
                 </td>
+            </tr>
+            <tr>
+                <td colspan="2">Total</td>
+                <td> {{ total }}</td>
+                <td></td>
             </tr>
         </table>
 
@@ -55,13 +58,18 @@
     import {db} from './../firebase'
     import AsistenciaForm from './../components/AsistenciaForm'
 
+    import Vue from 'vue'
+    export const eventBusAsistencia = new Vue();
+
     export default {
         name: "asistencia-table",
+        eventBusAsistencia,
         components:{
             AsistenciaForm
         },
         data() {
           return{
+              search: '',
               dialog: false,
               editAsistencia: {}
           }
@@ -72,6 +80,29 @@
             },
             headers:{
                 type:Array
+            },
+            /*total:{
+                default: 0,
+
+            }*/
+        },
+        computed:{
+              total(){
+                  let total=0;
+                  this.asistencias.forEach((asistencia)=> {
+                      total = parseInt(total) + parseInt(asistencia.precio)
+                  })
+                  return total;
+              },
+            filterAsistencias(){
+                let q = this.search
+                return this.asistencias.filter(function(asistencia){
+                    if(q != '') {
+                        console.log(asistencia.firstname.toString() + ' ' + q)
+                        return asistencia.firstname.toString().includes(q)
+                    }
+                    return true;
+                })
             }
         },
         methods:{
@@ -84,12 +115,21 @@
                 db.collection("asistencia").doc(this.editAsistencia.id).set({
                     'first_name': vm.editAsistencia.name,
                     'last_name': vm.editAsistencia.lastname,
-                    'email': vm.editAsistencia.email
+                    'email': vm.editAsistencia.email,
+                    'precio': vm.editAsistencia.precio
                 });
+
+                eventBusAsistencia.$emit('refresh-asistencia' /*,arg1, arg2*/);
                 alert(this.editAsistencia.name);
             },
-            destroy(id){
-                db.collection("asistencia").doc(id).delete()
+            destroy(asistencia){
+                alert('Entro al borrado')
+                let copyAsistencia = asistencia
+                db.collection("asistencia").doc(asistencia.id).delete().then(function() {
+                    eventBusAsistencia.$emit('refresh-borrado', copyAsistencia);
+                }).catch(function(error) {
+                    console.log(error)
+                });
             },
             reset(){
                 this.editAsistencia={}
